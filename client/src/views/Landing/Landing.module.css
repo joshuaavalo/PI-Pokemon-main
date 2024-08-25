@@ -1,0 +1,54 @@
+/* Landing.module.css */
+
+/* Estilo para el contenedor principal */
+.container {
+    display: flex; /* Usa Flexbox para centrar el contenido */
+    justify-content: center; /* Centra el contenido horizontalmente */
+    align-items: center; /* Centra el contenido verticalmente */
+    width: 100vw; /* Ocupa todo el ancho de la ventana */
+    height: 100vh; /* Ocupa todo el alto de la ventana */
+    background: linear-gradient(to right, #00c6ff, #0072ff); /* Fondo con degradado */
+    color: #fff; /* Color del texto */
+    text-align: center; /* Centra el texto */
+    padding: 20px; /* Espacio alrededor del contenido */
+    box-sizing: border-box; /* Incluye el padding y el borde en el tamaño total */
+  }
+  
+  /* Estilo para el contenido */
+  .content {
+    max-width: 1000px; /* Limita el ancho máximo del contenido */
+  }
+  
+  /* Estilo para el primer título */
+  .title1 {
+    font-size: 4.5rem;
+    margin-bottom: 20px;
+    white-space: nowrap; /* Evita que el texto se divida en múltiples líneas */
+    overflow: hidden; /* Oculta el texto que desborda */
+    text-overflow: ellipsis; /* Muestra puntos suspensivos si el texto desborda */
+    transform: skewY(-10deg); /* Aplica un efecto de inclinación hacia arriba */
+  }
+  
+  /* Estilo para el segundo título */
+  .title2 {
+    font-size: 1.5rem; /* Tamaño de la fuente más pequeño */
+    margin-bottom: 40px; /* Espacio debajo del título */
+  }
+  
+  /* Estilo para el botón */
+  .button {
+    display: inline-block; /* Hace que el enlace se comporte como un botón */
+    padding: 10px 20px; /* Espacio dentro del botón */
+    font-size: 1.2rem; /* Tamaño de la fuente del botón */
+    color: #fff; /* Color del texto del botón */
+    background-color: #ff5733; /* Color de fondo del botón */
+    border: none; /* Sin borde */
+    border-radius: 5px; /* Bordes redondeados */
+    text-decoration: none; /* Sin subrayado */
+    transition: background-color 0.3s; /* Transición para el efecto hover */
+  }
+  
+  .button:hover {
+    background-color: #c70039; /* Color de fondo al pasar el ratón */
+  }
+  

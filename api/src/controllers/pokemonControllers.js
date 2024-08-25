@@ -5,8 +5,9 @@ const{ API_URL } = process.env;
 const { Op } = require("sequelize");
 const { infoCleaner } = require("../helpers");
 const { cleanPokemon }= require("../helpers/cleanPokemon");
+const cleanPokes = require("../helpers/cleanPokes");
 
-
+/*
 const getApiPokemons = async () => {
     const apiUrl = await axios.get(`${API_URL}/pokemon?limit=50`);
     const results = apiUrl.data.results
@@ -60,22 +61,146 @@ const getAllPokemons = async () => {
 
     return infoTotal;
 };
+*/
+const getPokemonsApi = async () => {
+  try {
+    const pokemonsInfoApi = await axios.get(`${API_URL}/pokemon?limit=50`);
+    const pokemonUrls = pokemonsInfoApi.data.results.map((pokemon) => pokemon.url);
 
+    const pokemonApiResponses = await Promise.all(pokemonUrls.map((url) => axios.get(url)));
 
-const getDetailPokemon = async(req, res) => {
-  try{
-    const allPokemons = await getAllPokemons();
-    const { idPokemon } = req.params;
-    if(idPokemon){
-      const pokemonId = allPokemons.filter(p => p.id == idPokemon);
-      pokemonId.length ?
-      res.json(pokemonId):
-      res.status(404).send('No existe un Pokemon con ese ID')
-    } 
+    const cleanedPokemonData = pokemonApiResponses.map((response) => cleanPokemon(response.data));
+
+    return cleanedPokemonData;
   } catch (error) {
-        throw new Error(error);
-      }
+    throw new Error(`Error al obtener datos de la API: ${error.message}`);
+  }
+};
+
+const getPokemonsDB = async () => {
+  try {
+    const pokemonsDB = await Pokemon.findAll({
+      include: {
+        model: Type,
+        attributes: ["name"],
+        through: {
+          attributes: [],
+        },
+      },
+    });
+
+    return pokemonsDB.map(pokemon => {
+      const json = pokemon.toJSON();
+      return {
+        ...json,
+        types: json.types.map(type => type.name),
+      };
+    });
+  } catch (error) {
+    throw new Error(`Error al obtener datos de la base de datos: ${error.message}`);
+  }
+};
+
+const getAllPokemons = async () => {
+  try {
+    const [pokemonApiData, pokemonDBData] = await Promise.all([getPokemonsApi(), getPokemonsDB()]);
+    return [...pokemonApiData, ...pokemonDBData];
+  } catch (error) {
+    throw new Error(`Error al obtener todos los datos: ${error.message}`);
+  }
+};
+/*
+const getDetailPokemon = async(id, source) => {
+  try {
+    console.log(source)
+    
+    //let response;
+    if(source !== 'api'){
+       const infodb = await Pokemon.findAll()//(id//,{include: [{
+      //     model: Type, attributes: ['name'], through: { attributes: []} }]}
+       
+      //);
+          if(!infodb){
+            throw new Error("pekemon no encontrado");
+        }
+        const response = infodb;
+        
+    
+     } 
+    else {
+       // Si no es un UUID válido, buscamos en la API
+       const apiResponse = await axios.get(`${API_URL}/pokemon/${id}`);
+       const pokemonDataApi = apiResponse.data;
+
+       if (!pokemonDataApi) {
+        throw new Error(`El Pokémon con ID '${id}' no se encontró en la API.`);
+     }
+
+       response = cleanPokes(pokemonDataApi, true);
+    }
+
+    if (!response) {
+      throw new Error(`El Pokémon con ID '${id}' no se encontró.`);
+    }
+
+    return response;
+  } catch (error) {
+    throw new Error({ error: error.message });
+  }
 }
+*/
+const getDetailPokemon = async (id, source) => {
+  try {
+    let response;
+
+    if (source !== 'api') {
+      // Buscar el Pokémon por su UUID en la base de datos
+      const infodb = await Pokemon.findOne({
+        where: { id },
+        include: [{
+          model: Type,
+          attributes: ['name'],
+          through: { attributes: [] },
+        }],
+      });
+
+      if (!infodb) {
+        throw new Error("Pokémon no encontrado en la base de datos.");
+      }
+
+      // Transformar la respuesta para que coincida con el formato de la API
+      response = {
+        id: infodb.id,
+        name: infodb.name,
+        image: infodb.image,
+        life: infodb.life,
+        attack: infodb.attack,
+        defense: infodb.defense,
+        speed: infodb.speed,
+        height: infodb.height,
+        weight: infodb.weight,
+        types: infodb.types ? infodb.types.map(type => ({ name: type.name })) : [],
+        created: true,
+      };
+    } else {
+      // Buscar en la API
+      const apiResponse = await axios.get(`${API_URL}/pokemon/${id}`);
+      const pokemonDataApi = apiResponse.data;
+
+      if (!pokemonDataApi) {
+        throw new Error(`El Pokémon con ID '${id}' no se encontró en la API.`);
+      }
+
+      response = cleanPokes(pokemonDataApi, true);
+    }
+
+    return response;
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+
 
 /*const getPokemonByName = async (name1) => {
     

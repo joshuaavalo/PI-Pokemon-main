@@ -1,6 +1,18 @@
 const { Pokemon, Type } = require("../db");
 
-const createPokemon = async (name, image, life, attack, defense, speed, height, weight, types, created) => {
+const createPokemon = async (
+  name,
+  image,
+  life,
+  attack,
+  defense,
+  speed,
+  height,
+  weight,
+  types,
+  created
+) => {
+  //console.log("Request Body:", req.body); // Verifica los datos recibidos en el servidor
   try {
     if (!name || !image || !life || !attack || !defense) {
       throw new Error("Los campos obligatorios no pueden estar vacíos");
@@ -11,23 +23,23 @@ const createPokemon = async (name, image, life, attack, defense, speed, height, 
     // Busca los tipos en la base de datos
     const typeRecords = await Type.findAll({ where: { name: typeNames } }); // hace la busqueda en db del type.
 
-    
-  const pokeFind = await Pokemon.findOne({
-  where:{name:name}
+    const pokeFind = await Pokemon.findOne({
+      where: { name: name },
+    });
+    if (pokeFind) {
+      throw new Error("this pokemon already exists");
+    }
 
-  });
-  if(pokeFind){throw new Error("this pokemon already exists")};
-
-    const createdPokemon = await Pokemon.create({ 
-      name:name,
-      image:image,
-      life:parseInt(life),// antes de entrar a la base de datos lo convierte en entero
-      attack:parseInt(attack),
-      defense:parseInt(defense),
-      speed:parseInt(speed),
-      height:parseInt(height),
-      weight:parseInt(weight),
-      created:created,
+    const createdPokemon = await Pokemon.create({
+      name: name,
+      image: image,
+      life: parseInt(life), // antes de entrar a la base de datos lo convierte en entero
+      attack: parseInt(attack),
+      defense: parseInt(defense),
+      speed: parseInt(speed),
+      height: parseInt(height),
+      weight: parseInt(weight),
+      created: created,
     });
 
     // Asocia los tipos al Pokémon creado
@@ -38,11 +50,8 @@ const createPokemon = async (name, image, life, attack, defense, speed, height, 
 
     return createdPokemon;
   } catch (error) {
-    throw  error;
+    throw error;
   }
 };
 
 module.exports = createPokemon;
-
-
-

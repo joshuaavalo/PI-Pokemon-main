@@ -1,0 +1,18 @@
+.mainContainer {
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    padding: auto;
+    background-color: rgb(255, 253, 127);
+    justify-content: space-around;
+    border: 1px solid black;
+}
+
+.h1{
+    font-size: larger;
+    
+}
+
+.buton {
+    margin: 20px;
+}

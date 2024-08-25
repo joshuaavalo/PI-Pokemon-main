@@ -1,11 +1,11 @@
-const { getAllPokemons, getPokemonByName, getTypes } = require("../controllers/pokemonControllers");
+const { getAllPokemons, getPokemonByName, getTypes, getDetailPokemon } = require("../controllers/pokemonControllers");
 const  createPokemon  = require ("../controllers/postController");
 
 
 const getPokemonHandler = async (req, res) => {
     
     const {name} = req.query
-    console.log(name);
+    //console.log(name);
     try {
         if (name) { // Si hay un parámetro de consulta "name"
             //const name = req.query.name;
@@ -21,20 +21,31 @@ const getPokemonHandler = async (req, res) => {
     }
 };
 
+// const getDetailHandler = async(req, res) => {
+//     try{
+//       const allPokemons = await getAllPokemons();
+//       const { idPokemon } = req.params;
+//       if(idPokemon){
+//         const pokemonId = allPokemons.filter(p => p.id == idPokemon);
+//         pokemonId.length ?
+//         res.json(pokemonId):
+//         res.status(404).send('No existe un Pokemon con ese ID')
+//       } 
+//     } catch (error) {
+//           throw new Error(error);
+//         }
+//   }
 const getDetailHandler = async(req, res) => {
-    try{
-      const allPokemons = await getAllPokemons();
-      const { idPokemon } = req.params;
-      if(idPokemon){
-        const pokemonId = allPokemons.filter(p => p.id == idPokemon);
-        pokemonId.length ?
-        res.json(pokemonId):
-        res.status(404).send('No existe un Pokemon con ese ID')
-      } 
-    } catch (error) {
-          throw new Error(error);
-        }
+  const{id}= req.params
+  const source = isNaN(id)? 'db':'api';
+  try {
+    const response = await getDetailPokemon(id, source)
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(400).json({error:error.message})
   }
+}
+
 
 const getTypeHandler = async (req, res) => {
     try {
@@ -48,7 +59,7 @@ const getTypeHandler = async (req, res) => {
 
 const postPokemonHandler = async (req, res) => {
     const { name, image, life, attack, defense, speed, height, weight, types, created } = req.body;
-    console.log("soy el body :  ", req.body)
+    //console.log("soy el body :  ", req.body)
 
   try {
     const newPokemon = await createPokemon(name.toLowerCase(), image, life, attack, defense, speed, height, weight, types, created);

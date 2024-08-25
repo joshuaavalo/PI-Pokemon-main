@@ -1,7 +1,7 @@
 // aqui van las funciones que usaré en los controllers o las funciones que son reutilizables
 //! los que tengan el atributo created: false (son de la Api)
 //! los que tengan el atributo created: true (son de la DB)
-const { Pokemon, Type } = require("../db");
+//const { Pokemon, Type } = require("../db");
 
 const cleanPokemon = (pokemon) => {
 
@@ -22,7 +22,7 @@ const cleanPokemon = (pokemon) => {
     height: pokemon.height,
     weight: pokemon.weight,
     // Convierte el array de tipos a una cadena de texto separada por comas
-    types: types.join(', '),
+    types:  pokemon.types.map((type) => type.type.name),
     created: false,
   };
 };
